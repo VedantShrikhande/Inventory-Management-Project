@@ -43,7 +43,7 @@ except Exception as e:
     raise
 
 # ---------- CONFIG ----------
-DB_URI = os.getenv('DB_URI', 'mysql+pymysql://root:password@localhost:3306/ims_db')
+DB_URI = os.getenv('DB_URI', 'mysql+pymysql://root:root@localhost:3306/ims_db')
 engine = create_engine(DB_URI, pool_recycle=3600)
 
 # ---------- CORE FUNCTIONS (no Streamlit dependency) ----------

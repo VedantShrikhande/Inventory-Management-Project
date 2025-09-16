@@ -1,28 +1,17 @@
 import streamlit as st
 import pandas as pd
 import mysql.connector
+import sqlalchemy
+
+engine = sqlalchemy.create_engine("mysql+pymysql://root:your_password@localhost/ims_db")
+
+@st.cache_data
+def run_query(query):
+    return pd.read_sql(query, engine)
 
 # ----------------------------
 # 1. Database connection
 # ----------------------------
-DB_CONFIG = {
-    "host": "localhost",        # 🔹 Change if DB is on another server
-    "user": "root",             # 🔹 Your MySQL username
-    "password": "root",# 🔹 Your MySQL password
-    "database": "ims_db"        # 🔹 Database you created
-}
-
-def run_query(query, fetch=True):
-    """Execute a query and return result as DataFrame if fetch=True"""
-    conn = mysql.connector.connect(**DB_CONFIG)
-    cur = conn.cursor(dictionary=True)
-    cur.execute(query)
-    data = cur.fetchall() if fetch else None
-    conn.commit()
-    cur.close()
-    conn.close()
-    if fetch:
-        return pd.DataFrame(data)
 
 # ----------------------------
 # 2. Sidebar Navigation

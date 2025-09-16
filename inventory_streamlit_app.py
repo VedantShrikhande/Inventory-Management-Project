@@ -36,6 +36,7 @@ except ModuleNotFoundError:
 # core libs (used in both modes)
 try:
     import pandas as pd
+    import sqlalchemy
     from sqlalchemy import create_engine, text
 except Exception as e:
     print('Required packages missing: please install pandas and sqlalchemy.\nRun: pip install pandas sqlalchemy pymysql')

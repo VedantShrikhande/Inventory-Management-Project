@@ -1,18 +1,65 @@
+import os
+from urllib.parse import quote_plus
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy import MetaData
+from dotenv import load_dotenv
 import streamlit as st
-import pandas as pd
-import mysql.connector
-import sqlalchemy
-
-engine = sqlalchemy.create_engine("mysql+pymysql://root:your_password@localhost/ims_db")
-
-@st.cache_data
-def run_query(query):
-    return pd.read_sql(query, engine)
+from dotenv import load_dotenv
+from db import get_engine, get_session, get_reflected_base
+import psutil
 
 # ----------------------------
 # 1. Database connection
 # ----------------------------
+load_dotenv()
 
+DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
+DB_PORT = int(os.getenv("DB_PORT", "3306"))
+DB_NAME = os.getenv("DB_NAME", "ims_db")
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASS = os.getenv("DB_PASS", "root")
+SQL_ECHO = os.getenv("SQL_ECHO", "false").lower() == "true"
+
+def get_engine():
+    url = f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASS)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    engine = create_engine(url, echo=SQL_ECHO, pool_pre_ping=True, pool_recycle=1800)
+    return engine
+
+def get_session(engine=None):
+    engine = engine or get_engine()
+    Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    return Session()
+
+def get_reflected_base(engine=None):
+    engine = engine or get_engine()
+    metadata = MetaData()
+    metadata.reflect(engine)
+    Base = automap_base(metadata=metadata)
+    Base.prepare()
+    return Base
+
+
+
+DB_CONFIG = {
+    "host": "localhost",        # 🔹 Change if DB is on another server
+    "user": "root",             # 🔹 Your MySQL username
+    "password": "root",# 🔹 Your MySQL password
+    "database": "ims_db"        # 🔹 Database you created
+}
+
+def run_query(query, fetch=True):
+    """Execute a query and return result as DataFrame if fetch=True"""
+    conn = mysql.connector.connect(**DB_CONFIG)
+    cur = conn.cursor(dictionary=True)
+    cur.execute(query)
+    data = cur.fetchall() if fetch else None
+    conn.commit()
+    cur.close()
+    conn.close()
+    if fetch:
+        return pd.DataFrame(data)
 # ----------------------------
 # 2. Sidebar Navigation
 # ----------------------------

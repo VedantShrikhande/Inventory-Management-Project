@@ -7,10 +7,10 @@ import mysql.connector
 # 1. UPDATE THESE CREDENTIALS
 # ----------------------------
 DB_CONFIG = {
-    "host": "localhost",        # 🔹 Change if DB is on another server
-    "user": "root",             # 🔹 Your MySQL username
-    "password": "your_password",# 🔹 Your MySQL password
-    "database": "ims_db"        # 🔹 Ensure DB is created with your schema
+    "host": "localhost",       
+    "user": "root",             
+    "password": "root",
+    "database": "ims_db"       
 }
 
 # ----------------------------
